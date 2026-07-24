@@ -1,0 +1,19 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  mobile-tests:
+    build: .
+    container_name: mobile_automation_tests
+    environment:
+      # host.docker.internal resolves to the host machine's IP from inside
+      # the container — this is how the container reaches the Appium
+      # server running on Windows (outside Docker)
+      - APPIUM_SERVER_URL=http://host.docker.internal:4723
+    volumes:
+      # Mount the reports folder so results are visible on the host
+      # even after the container stops
+      - ./reports:/app/reports
+    extra_hosts:
+      # Ensures host.docker.internal resolves correctly on all platforms
+      - "host.docker.internal:host-gateway"

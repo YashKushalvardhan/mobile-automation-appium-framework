@@ -4,14 +4,7 @@ pipeline {
     agent any
 
     environment {
-        // Appium server + emulator run on the Windows host, not inside
-        // any container. host.docker.internal lets containers reach
-        // services running on the host machine.
         APPIUM_SERVER_URL = "http://host.docker.internal:4723"
-
-        // NOTE: Since Jenkins itself runs inside a Linux container,
-        // this path must be reachable by the Appium server process,
-        // which runs on the Windows host — so this stays a Windows path.
         APK_PATH = "E:\\Automation\\mobile-automation-appium-framework\\apps\\ApiDemos.apk"
     }
 
@@ -19,7 +12,6 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // Pulls the latest code from GitHub
                 git branch: 'main', url: 'https://github.com/YashKushalvardhan/mobile-automation-appium-framework.git'
             }
         }
@@ -39,12 +31,14 @@ pipeline {
                     -e APK_PATH="$APK_PATH" \
                     -v $WORKSPACE/reports:/app/reports \
                     mobile-automation-tests \
-                    python -m pytest -v --alluredir=reports/allure-results
+                    python -m pytest -v --alluredir=reports/allure-results --reruns 2 --reruns-delay 5
                 '''
             }
         }
+
         stage('Publish Allure Report') {
             steps {
+                // Publishes the Allure results as a Jenkins build report
                 allure includeProperties: false, jdk: '', results: [[path: 'reports/allure-results']]
             }
         }

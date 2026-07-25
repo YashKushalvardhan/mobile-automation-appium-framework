@@ -38,8 +38,14 @@ pipeline {
                     -e APPIUM_SERVER_URL=$APPIUM_SERVER_URL \
                     -e APK_PATH="$APK_PATH" \
                     -v $WORKSPACE/reports:/app/reports \
-                    mobile-automation-tests
+                    mobile-automation-tests \
+                    python -m pytest -v --alluredir=reports/allure-results
                 '''
+            }
+        }
+        stage('Publish Allure Report') {
+            steps {
+                allure includeProperties: false, jdk: '', results: [[path: 'reports/allure-results']]
             }
         }
     }

@@ -30,11 +30,9 @@ pipeline {
                     mobile-automation-tests \
                     python -m pytest -v --alluredir=reports/allure-results --reruns 2 --reruns-delay 5 || true
                 '''
-                // Copy allure results OUT of the container using docker cp.
-                // Unlike volume mounts, docker cp resolves paths from the
-                // Jenkins container's own filesystem, avoiding the host/
-                // container path mismatch that happens with -v when the
-                // Docker daemon runs on a different machine than Jenkins.
+                // Ensure the destination directory exists before copying —
+                // docker cp does not create parent directories automatically
+                sh 'mkdir -p reports'
                 sh 'docker cp mobile-tests-run:/app/reports/allure-results ./reports/allure-results'
                 sh 'docker rm mobile-tests-run'
             }

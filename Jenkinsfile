@@ -1,5 +1,3 @@
-// Jenkinsfile
-
 pipeline {
     agent any
 
@@ -25,20 +23,25 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                    docker run --rm \
+                    docker run --name mobile-tests-run \
                     --add-host=host.docker.internal:host-gateway \
                     -e APPIUM_SERVER_URL=$APPIUM_SERVER_URL \
                     -e APK_PATH="$APK_PATH" \
-                    -v $WORKSPACE/reports:/app/reports \
                     mobile-automation-tests \
-                    python -m pytest -v --alluredir=reports/allure-results --reruns 2 --reruns-delay 5
+                    python -m pytest -v --alluredir=reports/allure-results --reruns 2 --reruns-delay 5 || true
                 '''
+                // Copy allure results OUT of the container using docker cp.
+                // Unlike volume mounts, docker cp resolves paths from the
+                // Jenkins container's own filesystem, avoiding the host/
+                // container path mismatch that happens with -v when the
+                // Docker daemon runs on a different machine than Jenkins.
+                sh 'docker cp mobile-tests-run:/app/reports/allure-results ./reports/allure-results'
+                sh 'docker rm mobile-tests-run'
             }
         }
 
         stage('Publish Allure Report') {
             steps {
-                // Publishes the Allure results as a Jenkins build report
                 allure includeProperties: false, jdk: '', results: [[path: 'reports/allure-results']]
             }
         }

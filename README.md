@@ -41,6 +41,10 @@ This framework automates the native Android **ApiDemos** sample application, cov
 
 The goal of this project was not just to write Appium tests, but to build a **complete, CI/CD-integrated mobile automation pipeline** that mirrors how real QA/SDET teams operate — from a developer's local machine, through containerization, through automated CI/CD, to real-device validation.
 
+### Framework in Action (Local Emulator)
+
+![Emulator Running Tests](screenshots/emulator-running.png)
+
 ---
 
 ## Architecture
@@ -214,6 +218,14 @@ The Jenkins pipeline (see `Jenkinsfile`) performs the following stages on every 
 
 Jenkins itself runs as a Docker container using the **Docker-outside-of-Docker (DooD)** pattern — it controls the host's Docker engine via a mounted `docker.sock`, rather than running a nested Docker daemon.
 
+### Pipeline in Action
+
+**All Stages Passing:**
+![Jenkins Pipeline Stages](screenshots/jenkins-pipeline-stages.png)
+
+**Console Output:**
+![Jenkins Console Output](screenshots/jenkins-console-output.png)
+
 ---
 
 ## Real Device Testing (BrowserStack)
@@ -225,6 +237,9 @@ In addition to the local emulator setup, this framework validates the same test 
 - **The same Page Objects (`HomePage`, `BasePage`) are reused without modification** — proving the framework's abstraction is portable across execution environments (local emulator vs. real cloud device)
 - Credentials (`BROWSERSTACK_USERNAME`, `BROWSERSTACK_ACCESS_KEY`) are read from environment variables, never hardcoded
 - Every run is visible on the BrowserStack dashboard with full video playback, device logs, and network logs
+- ### BrowserStack Session Proof
+
+![BrowserStack Dashboard](screenshots/browserstack-dashboard.png)
 
 ---
 
@@ -235,6 +250,14 @@ Test results are captured via **Allure**, providing:
 - Per-test execution timeline and duration
 - Full stack traces for failures
 - A visual report accessible both locally (`allure serve`) and inside Jenkins (via the Allure Jenkins Plugin)
+- Test results are captured via **Allure**, providing:
+- ### Sample Reports
+
+**Test Summary Dashboard:**
+![Allure Summary](screenshots/allure-summary.png)
+
+**Individual Test Detail:**
+![Allure Test Detail](screenshots/allure-test-detail.png)
 
 ---
 
